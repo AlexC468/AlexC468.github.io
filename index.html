@@ -1,73 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My First Website</title>
-  
-  <!-- Linking the external CSS stylesheet for styling -->
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <!-- Linking our external CSS stylesheet for styling -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Header Section: Contains the main title and welcome message -->
-  <header>
-    <h1 id="main-title">Welcome to My Website!</h1>
-    <p>Built with HTML, CSS, and JavaScript.</p>
-  </header>
+    <!-- Header Section: Main title and navigation -->
+    <header>
+        <h1 id="main-title">Welcome to My Personal Space!</h1>
+        <p>A web page built from scratch with HTML, CSS, and JS.</p>
+    </header>
 
-  <!-- Main Content Area -->
-  <main>
-    <section class="card">
-      <h2>About This Site</h2>
-      <p>This is my personal website hosted live on GitHub Pages. I can customize this text, change the background colors, or add cool dynamic features!</p>
-      
-      <!-- Interactive Button -->
-      <button id="action-btn">Click Me for a Surprise!</button>
-      
-      <!-- Hidden Message Container -->
-      <p id="secret-message" class="hidden">🎉 You just ran JavaScript code on your site!</p>
-    </section>
-  </main>
+    <!-- Main Content Area -->
+    <main>
+        <section class="card">
+            <h2>About Me</h2>
+            <p>Hi! I'm an aspiring developer learning how to build and host web projects.</p>
+        </section>
 
-  <!-- Floating Star Button (Bottom Right Corner) -->
-  <button id="tetris-btn" aria-label="Play Tetris">⭐</button>
+        <section class="card">
+            <h2>Interactive Feature</h2>
+            <p>Click the button below to see JavaScript in action!</p>
+            <!-- Button that triggers our JavaScript function -->
+            <button id="interactive-btn">Click Me!</button>
+            <p id="message-display"></p>
+        </section>
+    </main>
 
-  <!-- Tetris Game Modal Overlay -->
-  <div id="tetris-modal" class="modal hidden">
-    <div class="modal-content">
-      <button id="close-tetris" class="close-btn">&times;</button>
-      <h2>Classic Tetris</h2>
-      
-      <div class="game-container">
-        <!-- Canvas where JavaScript draws the Tetris board -->
-        <canvas id="tetris" width="240" height="400"></canvas>
-        
-        <div class="game-stats">
-          <p>Score: <span id="score">0</span></p>
-          <p>Lines: <span id="lines">0</span></p>
-          <p>Level: <span id="level">1</span></p>
-          
-          <button id="start-game-btn">Start Game</button>
-          
-          <div class="controls-hint">
-            <p><strong>Controls:</strong></p>
-            <p>⬅️ ➡️ Move</p>
-            <p>⬆️ Rotate</p>
-            <p>⬇️ Soft Drop</p>
-            <p>Space: Hard Drop</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2026 Built with pride on GitHub Pages</p>
+    </footer>
 
-  <!-- Footer Section -->
-  <footer>
-    <p>© 2026 Created by a Future Software Developer</p>
-  </footer>
-
-  <!-- Linking the external JavaScript file -->
-  <script src="script.js"></script>
+    <!-- Linking our external JavaScript file (placed at bottom so HTML loads first) -->
+    <script src="script.js"></script>
 </body>
 </html>
