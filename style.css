@@ -1,82 +1,64 @@
-/* GLOBAL STYLES: Set default styles for the entire page */
+/* General reset and base font styles for the entire body */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    margin: 0;
-    padding: 0;
     background-color: #f4f7f6;
     color: #333;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* HEADER STYLING: Make the top section stand out with a modern gradient */
-header {
-    background: linear-gradient(135deg, #4b6cb7, #182848);
-    color: white;
-    text-align: center;
-    padding: 2.5rem 1rem;
-}
-
-header h1 {
     margin: 0;
-    font-size: 2.5rem;
-}
-
-/* MAIN CONTENT: Center the content card on the screen */
-main {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-}
-
-/* CARD CONTAINER: Add a clean box with a soft shadow around our content */
-.card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 100%;
+    padding: 0;
     text-align: center;
 }
 
-/* BUTTON STYLING: Make the button interactive with smooth hover effects */
+/* Header banner styling */
+header {
+    background-color: #2b3a42;
+    color: #ffffff;
+    padding: 2rem 1rem;
+}
+
+/* Main container spacing */
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* Styling reusable content cards */
+.card {
+    background: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling with smooth hover transitions */
 button {
-    background-color: #4b6cb7;
+    background-color: #3f51b5;
     color: white;
     border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    margin-top: 1rem;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #3b5998;
+    background-color: #303f9f;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-/* MESSAGE STYLING: Style the dynamic text updated by JavaScript */
-#message-text {
-    margin-top: 1.5rem;
+/* Message styling triggered by JavaScript */
+#message-display {
+    margin-top: 15px;
     font-weight: bold;
     color: #2e7d32;
 }
 
-/* FOOTER STYLING: Stick the footer at the bottom */
+/* Footer styling */
 footer {
-    text-align: center;
-    padding: 1rem;
+    padding: 10px;
     background-color: #e0e0e0;
-    font-size: 0.9rem;
     color: #666;
+    font-size: 0.9rem;
 }
