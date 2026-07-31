@@ -1,38 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Awesome Website</title>
-    <!-- Link to our external CSS stylesheet for styling -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My First Website</title>
+  
+  <!-- Linking the external CSS stylesheet for styling -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Header Section: Contains the main title and introductory message -->
-    <header>
-        <h1>Welcome to My Website!</h1>
-        <p>Built from scratch using HTML, CSS, and JavaScript.</p>
-    </header>
+  <!-- Header Section: Contains the main title and welcome message -->
+  <header>
+    <h1 id="main-title">Welcome to My Website!</h1>
+    <p>Built with HTML, CSS, and JavaScript.</p>
+  </header>
 
-    <!-- Main Content Section: Holds the core content of the webpage -->
-    <main>
-        <section class="card">
-            <h2>About This Site</h2>
-            <p>This is a starter website hosted directly on GitHub Pages. You can customize every single detail you see here!</p>
-            
-            <!-- An interactive button that will trigger our JavaScript function -->
-            <button id="interactive-btn">Click Me!</button>
-            <p id="message-text"></p>
-        </section>
-    </main>
+  <!-- Main Content Area -->
+  <main>
+    <section class="card">
+      <h2>About This Site</h2>
+      <p>This is my personal website hosted live on GitHub Pages. I can customize this text, change the background colors, or add cool dynamic features!</p>
+      
+      <!-- Interactive Button -->
+      <button id="action-btn">Click Me for a Surprise!</button>
+      
+      <!-- Hidden Message Container -->
+      <p id="secret-message" class="hidden">🎉 You just ran JavaScript code on your site!</p>
+    </section>
+  </main>
 
-    <!-- Footer Section: Appears at the bottom of the page -->
-    <footer>
-        <p>© 2026 Created with ❤️ by a Web Developer</p>
-    </footer>
+  <!-- Floating Star Button (Bottom Right Corner) -->
+  <button id="tetris-btn" aria-label="Play Tetris">⭐</button>
 
-    <!-- Link to our external JavaScript file for interactive features -->
-    <script src="script.js"></script>
+  <!-- Tetris Game Modal Overlay -->
+  <div id="tetris-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-tetris" class="close-btn">&times;</button>
+      <h2>Classic Tetris</h2>
+      
+      <div class="game-container">
+        <!-- Canvas where JavaScript draws the Tetris board -->
+        <canvas id="tetris" width="240" height="400"></canvas>
+        
+        <div class="game-stats">
+          <p>Score: <span id="score">0</span></p>
+          <p>Lines: <span id="lines">0</span></p>
+          <p>Level: <span id="level">1</span></p>
+          
+          <button id="start-game-btn">Start Game</button>
+          
+          <div class="controls-hint">
+            <p><strong>Controls:</strong></p>
+            <p>⬅️ ➡️ Move</p>
+            <p>⬆️ Rotate</p>
+            <p>⬇️ Soft Drop</p>
+            <p>Space: Hard Drop</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <p>© 2026 Created by a Future Software Developer</p>
+  </footer>
+
+  <!-- Linking the external JavaScript file -->
+  <script src="script.js"></script>
 </body>
 </html>
