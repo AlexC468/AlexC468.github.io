@@ -1,204 +1,304 @@
-/* RESET & BASE STYLES */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+// Wait for the DOM content to fully load before running scripts
+document.addEventListener('DOMContentLoaded', () => {
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f7f6;
-  color: #333333;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
+  // --- 1. EXISTING WEBSITE SURPRISE BUTTON LOGIC ---
+  const actionBtn = document.getElementById('action-btn');
+  const secretMessage = document.getElementById('secret-message');
 
-/* HEADER STYLING */
-header {
-  background-color: #2c3e50;
-  color: #ffffff;
-  text-align: center;
-  padding: 2.5rem 1rem;
-}
+  if (actionBtn && secretMessage) {
+    actionBtn.addEventListener('click', () => {
+      if (secretMessage.classList.contains('hidden')) {
+        secretMessage.classList.remove('hidden');
+        actionBtn.textContent = 'Hide Message';
+      } else {
+        secretMessage.classList.add('hidden');
+        actionBtn.textContent = 'Click Me for a Surprise!';
+      }
+    });
+  }
 
-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-}
+  // --- 2. TETRIS MODAL & GAME ENGINE LOGIC ---
+  const tetrisBtn = document.getElementById('tetris-btn');
+  const tetrisModal = document.getElementById('tetris-modal');
+  const closeTetris = document.getElementById('close-tetris');
+  const startGameBtn = document.getElementById('start-game-btn');
 
-/* MAIN CONTENT CONTAINER */
-main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-}
+  const canvas = document.getElementById('tetris');
+  const context = canvas.getContext('2d');
+  
+  // Scale everything up by 20x (10x20 grid = 200x400 pixels canvas area)
+  context.scale(20, 20);
 
-.card {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  text-align: center;
-}
+  // Official classic Tetromino piece shapes and colors
+  const PIECES = {
+    'I': [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],
+    'L': [[0,2,0],[0,2,0],[0,2,2]],
+    'J': [[0,3,0],[0,3,0],[3,3,0]],
+    'O': [[4,4],[4,4]],
+    'Z': [[5,5,0],[0,5,5],[0,0,0]],
+    'S': [[0,6,6],[6,6,0],[0,0,0]],
+    'T': [[0,7,0],[7,7,7],[0,0,0]]
+  };
 
-.card h2 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
+  const COLORS = [
+    null,
+    '#00f0f0', // 1: Cyan (I)
+    '#f0a000', // 2: Orange (L)
+    '#0000f0', // 3: Blue (J)
+    '#f0f000', // 4: Yellow (O)
+    '#f00000', // 5: Red (Z)
+    '#00f000', // 6: Green (S)
+    '#a000f0'  // 7: Purple (T)
+  ];
 
-.card p {
-  margin-bottom: 1.5rem;
-}
+  // Game state variables
+  let arena = createMatrix(12, 20); // Standard 10 columns + 2 boundaries width, 20 height
+  let player = {
+    pos: {x: 0, y: 0},
+    matrix: null,
+    score: 0,
+    lines: 0,
+    level: 1
+  };
 
-/* PRIMARY BUTTON STYLING */
-#action-btn {
-  background-color: #3498db;
-  color: #ffffff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+  let dropCounter = 0;
+  let dropInterval = 1000; // Drops every 1000ms (1 sec) at Level 1
+  let lastTime = 0;
+  let requestId = null;
 
-#action-btn:hover {
-  background-color: #2980b9;
-}
+  // Create empty 2D array grid
+  function createMatrix(w, h) {
+    const matrix = [];
+    while (h--) {
+      matrix.push(new Array(w).fill(0));
+    }
+    return matrix;
+  }
 
-/* FLOATING YELLOW STAR BUTTON */
-#tetris-btn {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #f1c40f;
-  border: 3px solid #f39c12;
-  font-size: 28px;
-  cursor: pointer;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  z-index: 100;
-}
+  // Draw matrix (pieces or arena) on the canvas
+  function drawMatrix(matrix, offset) {
+    matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          context.fillStyle = COLORS[value];
+          context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          
+          // Add retro grid block outline
+          context.strokeStyle = '#000000';
+          context.lineWidth = 0.05;
+          context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+        }
+      });
+    });
+  }
 
-#tetris-btn:hover {
-  transform: scale(1.15) rotate(15deg);
-  background-color: #f39c12;
-}
+  // Main rendering loop
+  function draw() {
+    context.fillStyle = '#000';
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-/* TETRIS MODAL POPUP */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+    drawMatrix(arena, {x: 0, y: 0});
+    if (player.matrix) {
+      drawMatrix(player.matrix, player.pos);
+    }
+  }
 
-.modal-content {
-  background-color: #1a252f;
-  color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  position: relative;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  max-width: 90vw;
-}
+  // Merge fallen piece into the background arena
+  function merge(arena, player) {
+    player.matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          arena[y + player.pos.y][x + player.pos.x] = value;
+        }
+      });
+    });
+  }
 
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 28px;
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-}
+  // Check collision with wall or placed blocks
+  function collide(arena, player) {
+    const [m, o] = [player.matrix, player.pos];
+    for (let y = 0; y < m.length; ++y) {
+      for (let x = 0; x < m[y].length; ++x) {
+        if (m[y][x] !== 0 &&
+           (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-.close-btn:hover {
-  color: #e74c3c;
-}
+  // Clear completed rows and calculate score
+  function arenaSweep() {
+    let rowCount = 1;
+    outer: for (let y = arena.length - 1; y >= 0; --y) {
+      for (let x = 0; x < arena[y].length; ++x) {
+        if (arena[y][x] === 0) {
+          continue outer;
+        }
+      }
 
-/* GAME CANVAS & BOARD */
-.game-container {
-  display: flex;
-  gap: 20px;
-  margin-top: 15px;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+      const row = arena.splice(y, 1)[0].fill(0);
+      arena.unshift(row);
+      ++y;
 
-canvas#tetris {
-  border: 4px solid #ecf0f1;
-  background-color: #000000;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-}
+      player.score += rowCount * 100;
+      player.lines += 1;
+      rowCount *= 2;
 
-.game-stats {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 1.1rem;
-}
+      // Increase speed every 10 lines
+      player.level = Math.floor(player.lines / 10) + 1;
+      dropInterval = Math.max(100, 1000 - (player.level - 1) * 100);
+    }
+    updateScore();
+  }
 
-#start-game-btn {
-  background-color: #2ecc71;
-  color: #ffffff;
-  border: none;
-  padding: 10px 15px;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
-  font-weight: bold;
-}
+  // Move piece down automatically over time
+  function playerDrop() {
+    player.pos.y++;
+    if (collide(arena, player)) {
+      player.pos.y--;
+      merge(arena, player);
+      playerReset();
+      arenaSweep();
+    }
+    dropCounter = 0;
+  }
 
-#start-game-btn:hover {
-  background-color: #27ae60;
-}
+  // Instant drop piece to the bottom
+  function playerHardDrop() {
+    while (!collide(arena, player)) {
+      player.pos.y++;
+    }
+    player.pos.y--;
+    merge(arena, player);
+    playerReset();
+    arenaSweep();
+    dropCounter = 0;
+  }
 
-.controls-hint {
-  font-size: 0.85rem;
-  color: #bdc3c7;
-  margin-top: 10px;
-  line-height: 1.4;
-}
+  // Move piece left or right
+  function playerMove(dir) {
+    player.pos.x += dir;
+    if (collide(arena, player)) {
+      player.pos.x -= dir;
+    }
+  }
 
-/* UTILITY CLASSES */
-.hidden {
-  display: none !important;
-}
+  // Spawn new random piece
+  function playerReset() {
+    const pieces = 'ILJOTSZ';
+    const randomPiece = pieces[Math.floor(Math.random() * pieces.length)];
+    player.matrix = PIECES[randomPiece];
+    player.pos.y = 0;
+    player.pos.x = Math.floor(arena[0].length / 2) - Math.floor(player.matrix[0].length / 2);
 
-#secret-message {
-  margin-top: 1.5rem;
-  font-weight: bold;
-  color: #27ae60;
-}
+    // Game Over condition
+    if (collide(arena, player)) {
+      arena.forEach(row => row.fill(0));
+      alert('Game Over! Your Score: ' + player.score);
+      player.score = 0;
+      player.lines = 0;
+      player.level = 1;
+      dropInterval = 1000;
+      updateScore();
+    }
+  }
 
-/* FOOTER STYLING */
-footer {
-  background-color: #ecf0f1;
-  text-align: center;
-  padding: 1rem;
-  font-size: 0.9rem;
-  color: #7f8c8d;
-}
+  // Rotate piece matrix
+  function rotate(matrix, dir) {
+    for (let y = 0; y < matrix.length; ++y) {
+      for (let x = 0; x < y; ++x) {
+        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+      }
+    }
+    if (dir > 0) {
+      matrix.forEach(row => row.reverse());
+    } else {
+      matrix.reverse();
+    }
+  }
+
+  // Rotate piece with wall kick correction
+  function playerRotate(dir) {
+    const pos = player.pos.x;
+    let offset = 1;
+    rotate(player.matrix, dir);
+    while (collide(arena, player)) {
+      player.pos.x += offset;
+      offset = -(offset + (offset > 0 ? 1 : -1));
+      if (offset > player.matrix[0].length) {
+        rotate(player.matrix, -dir);
+        player.pos.x = pos;
+        return;
+      }
+    }
+  }
+
+  // Update UI scores
+  function updateScore() {
+    document.getElementById('score').textContent = player.score;
+    document.getElementById('lines').textContent = player.lines;
+    document.getElementById('level').textContent = player.level;
+  }
+
+  // Main Animation Loop
+  function update(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) {
+      playerDrop();
+    }
+
+    draw();
+    requestId = requestAnimationFrame(update);
+  }
+
+  // Key Event Listeners for Player Controls
+  function handleKeyDown(event) {
+    // Only capture controls if the game modal is open
+    if (tetrisModal.classList.contains('hidden')) return;
+
+    if (event.keyCode === 37) { // Left arrow
+      playerMove(-1);
+    } else if (event.keyCode === 39) { // Right arrow
+      playerMove(1);
+    } else if (event.keyCode === 40) { // Down arrow
+      playerDrop();
+    } else if (event.keyCode === 38) { // Up arrow (Rotate)
+      playerRotate(1);
+    } else if (event.keyCode === 32) { // Spacebar (Hard drop)
+      event.preventDefault();
+      playerHardDrop();
+    }
+  }
+
+  document.addEventListener('keydown', handleKeyDown);
+
+  // Toggle Modal & Start Game
+  tetrisBtn.addEventListener('click', () => {
+    tetrisModal.classList.remove('hidden');
+  });
+
+  closeTetris.addEventListener('click', () => {
+    tetrisModal.classList.add('hidden');
+    if (requestId) {
+      cancelAnimationFrame(requestId);
+      requestId = null;
+    }
+  });
+
+  startGameBtn.addEventListener('click', () => {
+    arena.forEach(row => row.fill(0));
+    player.score = 0;
+    player.lines = 0;
+    player.level = 1;
+    updateScore();
+    playerReset();
+    if (!requestId) {
+      update();
+    }
+  });
+});
